@@ -3,30 +3,34 @@
 namespace App\Entity;
 use App\Repository\AnswerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
+#[ORM\Table]
 #[ORM\Entity(repositoryClass: AnswerRepository::class)]
 class Answer
 {
-
+    #[Groups(['question', 'answer'])]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private int $id;
 
+    #[Groups(['question', 'answer'])]
     #[ORM\Column(type: "string", length: 255)]
     private string $channel;
 
+    #[Groups(['question', 'answer'])]
     #[ORM\Column(type: "string", length: 255)]
     private string $body;
 
-    #[ORM\ManyToOne(targetEntity: Question::class, inversedBy: "answers")]
+    #[Groups('answer')]
+    #[ORM\ManyToOne(targetEntity: Question::class, cascade: ["all"], inversedBy: "answers")]
     private $question;
 
     public function __construct()
     {
         $this->channel = Channel::faq;
     }
-
 
     /**
      * @return int
@@ -41,7 +45,7 @@ class Answer
         return $this->channel;
     }
 
-    public function setStatus(string $channel): self
+    public function setChannel(string $channel): self
     {
         $this->channel = $channel;
 
@@ -58,5 +62,21 @@ class Answer
         $this->body = $body;
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQuestion()
+    {
+        return $this->question;
+    }
+
+    /**
+     * @param mixed $question
+     */
+    public function setQuestion($question): void
+    {
+        $this->question = $question;
     }
 }
