@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  php:
+    container_name: "php-fpm"
+    build:
+      context: php
+    environment:
+      - APP_ENV=${APP_ENV}
+      - APP_SECRET=${APP_SECRET}
+    volumes:
+      - ${APP_FOLDER}:/var/www:delegated
+    networks:
+      - backend
+
+  nginx:
+    container_name: "api_nginx"
+    hostname: api_nginx
+    build:
+      context: nginx
+    volumes:
+      - ${APP_FOLDER}:/var/www:delegated
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./logs:/var/log
+    depends_on:
+      - php
+    ports:
+      - "8080:80"
+    networks:
+      - frontend
+      - backend
+      - api_network
+
+  pma:
+    container_name: "pma"
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8082:80
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    networks:
+      - frontend
+      - backend
+
+  db:
+    container_name: "mysql"
+    image: mariadb:10.3
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: "true"
+      MYSQL_USER: User
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+  api_network:
+    external: true
+
