@@ -22,7 +22,7 @@ class AnswerPostTest extends TestCase
         $answer
             ->setChannel(Channel::faq)
             ->setBody('message')
-            ->setQuestion($question)
+
         ;
 
         $this->assertTrue($answer->getChannel() === Channel::faq);

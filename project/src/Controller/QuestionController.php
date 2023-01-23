@@ -4,23 +4,38 @@ namespace App\Controller;
 
 use App\Entity\Answer;
 use App\Entity\Question;
+use App\Message\UpdateQuestionMessage;
 use App\Repository\QuestionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class QuestionController extends AbstractController
 {
+    /**
+     * @var SerializerInterface $serializer
+     */
     private SerializerInterface $serializer;
 
-    public function __construct(SerializerInterface $serializer)
+    /**
+     * @var MessageBusInterface $bus
+     */
+    private MessageBusInterface $bus;
+
+    /**
+     * @param SerializerInterface $serializer
+     * @param MessageBusInterface $bus
+     */
+    public function __construct(SerializerInterface $serializer, MessageBusInterface $bus)
     {
         $this->serializer = $serializer;
+        $this->bus = $bus;
     }
 
     #[Route('/api/questions', name: 'list_question', methods: 'GET')]
@@ -47,8 +62,9 @@ class QuestionController extends AbstractController
     #[Route('/api/question/{id}/edit', name: 'edit_question', methods: 'PUT' )]
     public function editQuestion(Question $question, SerializerInterface $serializer, Request $request, EntityManagerInterface $entityManager)
     {
+        $oldquestion = $entityManager->getRepository(Question::class)->find($question->getId());
         $updatedQuestion = $serializer->deserialize($request->getContent(), Question::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $question]);
-
+        $this->bus->dispatch(new UpdateQuestionMessage($oldquestion));
         $entityManager->persist($updatedQuestion);
         $entityManager->flush();
 
