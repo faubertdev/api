@@ -79,4 +79,9 @@ class Answer
     {
         $this->question = $question;
     }
+
+    public function __toString(): string
+    {
+        return $this->body;
+    }
 }
