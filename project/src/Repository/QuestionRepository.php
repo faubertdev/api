@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Question;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,6 +38,18 @@ class QuestionRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getAllAnswers(): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder('q');
+
+          return $qb->select('q')
+            ->addSelect('a')
+            ->from(Question::class , 'q')
+            ->innerJoin("q.answers", 'a', Join::WITH, 'q.id = a.question')
+            ->getQuery()
+            ->getArrayResult();
     }
 
 //    /**
