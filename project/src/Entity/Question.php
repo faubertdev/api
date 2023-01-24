@@ -37,18 +37,19 @@ class Question
 
     #[Groups(['question', 'answer'])]
     #[ORM\Column(name: "updated_at", type: "datetime", nullable: true)]
-    private \DateTime $updatedAt;
+    private ?\DateTime $updatedAt = null;
 
     #[Groups(['question'])]
     #[ORM\OneToMany(mappedBy: "question", targetEntity: Answer::class, cascade:["persist", "remove"])]
-    private Collection $answers;
+    private array $answers;
 
     #[ORM\OneToMany(mappedBy: 'question', targetEntity: HistoricQuestion::class)]
     private Collection $historicQuestions;
 
     public function __construct()
     {
-        $this->answers = new ArrayCollection();
+        $this->answers = [];
+        $this->updatedAt = null;
         $this->status = Status::Draft;
         $this->createdAt = new \DateTime('now');
         $this->historicQuestions = new ArrayCollection();
@@ -112,32 +113,32 @@ class Question
     }
 
     /**
-     * @return \DateTime
+     * @return null|\DateTime
      */
-    public function getUpdatedAt(): \DateTime
+    public function getUpdatedAt(): ?\DateTime
     {
         return $this->updatedAt;
     }
 
     /**
-     * @param \DateTime $updatedAt
+     * @param null|\DateTime $updatedAt
      */
-    public function setUpdatedAt(\DateTime $updatedAt): void
+    public function setUpdatedAt(?\DateTime $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
     }
 
     /**
-     * @return Collection
+     * @return array
      */
-    public function getAnswers(): Collection
+    public function getAnswers(): array
     {
         return $this->answers;
     }
 
     public function addAnswer(Answer $answer)
     {
-        $this->answers->add($answer);
+        $this->answers[] = $answer;
         $answer->setQuestion($this);
     }
 

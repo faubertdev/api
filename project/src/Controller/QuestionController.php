@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Answer;
 use App\Entity\Question;
+use App\Manager\ContentExportManager;
 use App\Message\UpdateQuestionMessage;
 use App\Repository\QuestionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -86,5 +87,11 @@ class QuestionController extends AbstractController
         $entityManager->flush();
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/api/export', name: 'api_export', options: ['expose' => true], methods: 'GET')]
+    public function export(EntityManagerInterface $entityManager, ContentExportManager $exportManager)
+    {
+        return $exportManager->getExportToCSV();
     }
 }

@@ -32,18 +32,21 @@ class AppFixtures extends Fixture
         $question1->setPromoted(true);
         $question1->setStatus(Status::Draft);
         $question1->setCreatedAt(new \DateTime('now'));
+        $question1->setUpdatedAt(new \DateTime('now'));
 
         $question2 = new Question();
         $question2->setTitle("Question 2");
         $question2->setPromoted(true);
         $question2->setStatus(Status::Draft);
         $question2->setCreatedAt(new \DateTime('now'));
+        $question2->setUpdatedAt(new \DateTime('now'));
 
         $question3 = new Question();
         $question3->setTitle("Question 2");
         $question3->setPromoted(true);
         $question3->setStatus(Status::Draft);
         $question3->setCreatedAt(new \DateTime('now'));
+        $question3->setUpdatedAt(new \DateTime('now'));
 
         $reponse1 = new Answer();
         $reponse1->setChannel(Channel::faq);
